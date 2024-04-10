@@ -1,6 +1,8 @@
-package pl.kairen.kairendotdevbackend.Entity;
+package pl.kairen.kairendotdevbackend.Gallery;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import pl.kairen.kairendotdevbackend.Image.Image;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +16,20 @@ public class Gallery {
     @Column(name = "url")
     private String url;
 
+    @Column(name = "path")
+    private String path;
+
     @OneToMany(mappedBy = "gallery", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonManagedReference("gallery")
     private List<Image> images = new ArrayList<>();
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
 
     public List<Image> getImages() {
         return images;

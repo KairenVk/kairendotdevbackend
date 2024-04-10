@@ -1,10 +1,10 @@
-package pl.kairen.kairendotdevbackend.Entity;
+package pl.kairen.kairendotdevbackend.User;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "user")
-public class User {
+@Table(name = "credentials")
+public class credentials {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
