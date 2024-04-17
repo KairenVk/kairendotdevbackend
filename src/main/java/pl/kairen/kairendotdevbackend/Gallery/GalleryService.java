@@ -2,6 +2,8 @@ package pl.kairen.kairendotdevbackend.Gallery;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
+import pl.kairen.kairendotdevbackend.Gallery.Exceptions.GalleryNotFoundException;
 import pl.kairen.kairendotdevbackend.Image.ImageService;
 
 import java.io.File;
@@ -17,7 +19,8 @@ public class GalleryService {
 
     @PostConstruct
     public void init() {
-            new File(STORAGE.toString()).mkdirs();
+        FileSystemUtils.deleteRecursively(new File("storage"));
+        new File(STORAGE.toString()).mkdirs();
     }
 
     GalleryService(GalleryRepository galleryRepository, ImageService imageService) {
@@ -34,7 +37,16 @@ public class GalleryService {
         new File(newGallery.getPath()).mkdir();
         new File(newGallery.getPath()+File.separator+"images").mkdirs();
         new File(newGallery.getPath()+File.separator+"thumbnails").mkdirs();
-        imageService.saveNewImages(requestBody.getImageList(),newGallery);
+
+        if (requestBody.getImageList() != null) {
+            imageService.saveNewImages(requestBody.getImageList(), newGallery);
+        }
         return newGallery;
+    }
+
+    public void deleteGallery(String galleryUrl) {
+        Gallery galleryToDelete = galleryRepository.findByUrl(galleryUrl).orElseThrow(() -> new GalleryNotFoundException(galleryUrl));
+        FileSystemUtils.deleteRecursively(new File(galleryToDelete.getPath()));
+        galleryRepository.delete(galleryToDelete);
     }
 }

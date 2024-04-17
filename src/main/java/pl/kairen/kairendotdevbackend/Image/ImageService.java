@@ -3,6 +3,8 @@ package pl.kairen.kairendotdevbackend.Image;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.kairen.kairendotdevbackend.Gallery.Gallery;
+import pl.kairen.kairendotdevbackend.Image.Exceptions.EmptyImageListException;
+import pl.kairen.kairendotdevbackend.Image.Exceptions.InvalidFileTypeException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -28,10 +30,12 @@ public class ImageService {
 
     public List<Image> saveNewImages(List<MultipartFile> imageList, Gallery gallery) {
 
+        validateImages(imageList);
         List<Image> images = new ArrayList<>();
         Path galleryPath = Paths.get(STORAGE.toString(),gallery.getUrl());
         Path galleryImagesPath = Paths.get(galleryPath.toString(), "images");
         Path galleryThumbnailsPath = Paths.get(galleryPath.toString(), "thumbnails");
+
         List<BufferedImage> scaledImages = scaleImages(imageList, imageDimension);
         List<BufferedImage> thumbnails = scaleImages(imageList, thumbnailDimension);
 
@@ -90,5 +94,18 @@ public class ImageService {
             int divisor = height/longerDimension;
             return width/divisor;
         }
+    }
+
+    private void validateImages(List<MultipartFile> imageList) {
+            for (MultipartFile image: imageList) {
+                try {
+                    if (!image.getContentType().startsWith("image") || image.getContentType() == null) {
+                        System.out.println(image.getContentType());
+                        throw new InvalidFileTypeException();
+                    }
+                } catch (NullPointerException e) {
+                    throw new EmptyImageListException();
+                }
+            }
     }
 }

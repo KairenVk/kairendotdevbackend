@@ -13,7 +13,7 @@ public class Gallery {
     @Id
     @Column(nullable = false, unique = true)
     private String name;
-    @Column(name = "url")
+    @Column(nullable = false, unique = true, name = "url")
     private String url;
 
     @Column(name = "path")
